@@ -6,7 +6,10 @@ const upload = require('../utils/Multer');
 const sendEmail = require('../utils/sendEmail');
 const otpStore = require('../utils/otpStore');
 const router = express.Router();
-const SECRET = 'im very shy because andhe ne movie dekhi aur gunge ne gaana gaya'; 
+require('dotenv').config();
+const SECRET = process.env.JWT_SECRET;
+
+
 
 
 router.post('/signup', upload.single('profilePic'), async (req, res) => {
