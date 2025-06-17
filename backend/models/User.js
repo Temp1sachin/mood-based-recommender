@@ -1,9 +1,17 @@
 const mongoose = require('mongoose');
 
+const movieSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  poster: { type: String },
+  description: { type: String },
+  genres: [String],
+  rating: { type: Number, min: 0, max: 5 },
+});
+
 const playlistSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  genre: { type: String, required: true },
-  rating: { type: Number, min: 0, max: 5 }
+  coverImage: { type: String },  // URL or Cloudinary link
+  movies: [movieSchema] // Array of movie objects
 });
 
 const userSchema = new mongoose.Schema({

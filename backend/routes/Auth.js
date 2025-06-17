@@ -2,7 +2,6 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const verifyToken=require('../middlewares/Verify')
 const upload = require('../utils/Multer');
 const sendEmail = require('../utils/sendEmail');
 const otpStore = require('../utils/otpStore');
@@ -38,7 +37,7 @@ router.post('/signup', upload.single('profilePic'), async (req, res) => {
 
 router.post('/verify-otp', async (req, res) => {
   const { email, otp } = req.body;
-  console.log(email);
+  
   const data = otpStore.get(email);
   if (!data) return res.status(400).json({ message: 'No OTP request found for this email' });
 
@@ -116,19 +115,6 @@ router.post('/reset-password', async (req, res) => {
   otpStore.delete(email);
 
   res.json({ message: 'Password reset successfully' });
-});
-
-
-router.post('/addPlaylist', verifyToken, async (req, res) => {
-  const { name, genre, rating } = req.body;
-  try {
-    const user = await User.findById(req.userId);
-    user.playlists.push({ name, genre, rating });
-    await user.save();
-    res.json(user.playlists);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
 });
 
 module.exports = router;
