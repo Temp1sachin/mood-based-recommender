@@ -89,8 +89,9 @@ export default function PlaylistGallery() {
       </div>
 
       {loading ? (
+        
         <p>Loading...</p>
-      ) : playlists.length === 0 ? (
+      ) : Array.isArray(playlists) && playlists.length === 0 ? (
         <p className="text-gray-600">No playlists found.</p>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
