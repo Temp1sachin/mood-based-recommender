@@ -1,6 +1,7 @@
 import { useRef, useEffect } from "react";
 import { gsap } from "gsap";
 import "./ChromaGrid.css";
+import { Trash2 } from "lucide-react";
 
 export const ChromaGrid = ({
   items,
@@ -11,6 +12,7 @@ export const ChromaGrid = ({
   damping = 0.45,
   fadeOut = 0.6,
   ease = "power3.out",
+  deletingId = null,
 }) => {
   const rootRef = useRef(null);
   const fadeRef = useRef(null);
@@ -159,7 +161,9 @@ export const ChromaGrid = ({
       {data.map((c, i) => (
         <article
           key={i}
-          className="chroma-card"
+          className={`chroma-card relative transition-all duration-300 ease-in-out ${
+            c.playlistId === deletingId ? "opacity-0 scale-90" : ""
+          }`}
           onMouseMove={handleCardMove}
           onClick={() => handleCardClick(c)}
           style={
@@ -179,6 +183,17 @@ export const ChromaGrid = ({
             <p className="role">{c.subtitle}</p>
             {c.location && <span className="location">{c.location}</span>}
           </footer>
+          {c.onDelete && !c.isCreate && (
+      <button
+        className="absolute top-2 right-2 text-red-500 hover:text-red-700 z-10"
+        onClick={(e) => {
+          e.stopPropagation(); // Don’t trigger card click
+          c.onDelete();
+        }}
+      >
+        <Trash2 size={18} />
+      </button>
+    )}
         </article>
       ))}
       <div className="chroma-overlay" />

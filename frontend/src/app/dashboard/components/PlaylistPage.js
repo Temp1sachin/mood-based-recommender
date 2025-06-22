@@ -67,6 +67,7 @@ export default function PlaylistPage() {
       onClick: () => setShowModal(true),
     },
     ...playlists.map((p) => ({
+        playlistId: p._id,
       image: p.coverImage || "/default.jpg",
       title: p.name,
       subtitle: "", // You can include a date or tracks count here
