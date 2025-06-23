@@ -6,6 +6,7 @@ const upload = require('../utils/Multer');
 const sendEmail = require('../utils/sendEmail');
 const otpStore = require('../utils/otpStore');
 const router = express.Router();
+const verifyToken = require('../middlewares/Verify');
 require('dotenv').config();
 const SECRET = process.env.JWT_SECRET;
 
@@ -120,4 +121,35 @@ router.post('/reset-password', async (req, res) => {
   res.json({ message: 'Password reset successfully' });
 });
 
+router.get('/profile', verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select('-password -otp -resetToken -resetTokenExpires');
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    res.status(200).json({ user });
+  } catch (err) {
+    console.error('Error fetching profile:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+router.get('/search', verifyToken, async (req, res) => {
+  const { email } = req.query;
+
+  if (!email) {
+    return res.status(400).json({ error: 'Email query param is required' });
+  }
+
+  try {
+    const regex = new RegExp(email, 'i'); // case-insensitive match
+    const users = await User.find({ email: regex }).select('email fullName profilePic _id');
+
+    // Optionally exclude the requesting user from results:
+    const filtered = users.filter(user => user._id.toString() !== req.userId);
+
+    res.status(200).json({ users: filtered });
+  } catch (err) {
+    console.error('User search error:', err);
+    res.status(500).json({ error: 'Server error during user search' });
+  }
+});
 module.exports = router;
