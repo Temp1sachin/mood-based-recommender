@@ -1,8 +1,8 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 // src/app/layout.js
-
-
+import { Toaster } from 'react-hot-toast';
+import BlendInvite from "../../components/invite";
 
 
 
@@ -28,6 +28,8 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <Toaster position="top-right" />
+        <BlendInvite/>
         {children}
       </body>
     </html>

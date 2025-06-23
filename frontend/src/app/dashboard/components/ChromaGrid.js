@@ -22,22 +22,18 @@ export const ChromaGrid = ({
 
   const demo = [
     {
-        image: "https://cdn-icons-png.flaticon.com/512/1828/1828817.png", // A plus icon
-        title: "Create Playlist",
-        subtitle: "Start something new",
-        handle: "",
-        borderColor: "#22C55E",
-        gradient: "linear-gradient(145deg, #22C55E, #000)",
-        url: "", // optional: you can add a handler instead
-        isCreate: true
+      image: "https://cdn-icons-png.flaticon.com/512/1828/1828817.png",
+      title: "Create Playlist",
+      subtitle: "Start something new",
+      handle: "",
+      url: "",
+      isCreate: true
     },
     {
       image: "https://i.pravatar.cc/300?img=11",
       title: "Jordan Chen",
       subtitle: "DevOps Engineer",
       handle: "@jordanchen",
-      borderColor: "#10B981",
-      gradient: "linear-gradient(210deg, #10B981, #000)",
       url: "https://linkedin.com/in/",
     },
     {
@@ -45,8 +41,6 @@ export const ChromaGrid = ({
       title: "Morgan Blake",
       subtitle: "UI/UX Designer",
       handle: "@morganblake",
-      borderColor: "#F59E0B",
-      gradient: "linear-gradient(165deg, #F59E0B, #000)",
       url: "https://dribbble.com/",
     },
     {
@@ -54,8 +48,6 @@ export const ChromaGrid = ({
       title: "Casey Park",
       subtitle: "Data Scientist",
       handle: "@caseypark",
-      borderColor: "#EF4444",
-      gradient: "linear-gradient(195deg, #EF4444, #000)",
       url: "https://kaggle.com/",
     },
     {
@@ -63,8 +55,6 @@ export const ChromaGrid = ({
       title: "Sam Kim",
       subtitle: "Mobile Developer",
       handle: "@thesamkim",
-      borderColor: "#8B5CF6",
-      gradient: "linear-gradient(225deg, #8B5CF6, #000)",
       url: "https://github.com/",
     },
     {
@@ -72,19 +62,8 @@ export const ChromaGrid = ({
       title: "Tyler Rodriguez",
       subtitle: "Cloud Architect",
       handle: "@tylerrod",
-      borderColor: "#06B6D4",
-      gradient: "linear-gradient(135deg, #06B6D4, #000)",
       url: "https://aws.amazon.com/",
     },
-    {
-        image: "https://i.pravatar.cc/300?img=60",
-        title: "Tyler Rodriguez",
-        subtitle: "Cloud Architect",
-        handle: "@tylerrod",
-        borderColor: "#06B6D4",
-        gradient: "linear-gradient(135deg, #06B6D4, #000)",
-        url: "https://aws.amazon.com/",
-      },
   ];
   const data = items?.length ? items : demo;
 
@@ -148,13 +127,11 @@ export const ChromaGrid = ({
     <div
       ref={rootRef}
       className={`chroma-grid ${className}`}
-      style={
-        {
-          "--r": `${radius}px`,
-          "--cols": columns,
-          "--rows": rows,
-        }
-      }
+      style={{
+        "--r": `${radius}px`,
+        "--cols": columns,
+        "--rows": rows,
+      }}
       onPointerMove={handleMove}
       onPointerLeave={handleLeave}
     >
@@ -166,13 +143,9 @@ export const ChromaGrid = ({
           }`}
           onMouseMove={handleCardMove}
           onClick={() => handleCardClick(c)}
-          style={
-            {
-              "--card-border": c.borderColor || "transparent",
-              "--card-gradient": c.gradient,
-              cursor: c.url ? "pointer" : "default",
-            }
-          }
+          style={{
+            cursor: c.url ? "pointer" : "default",
+          }}
         >
           <div className="chroma-img-wrapper">
             <img src={c.image} alt={c.title} loading="lazy" />
@@ -184,16 +157,16 @@ export const ChromaGrid = ({
             {c.location && <span className="location">{c.location}</span>}
           </footer>
           {c.onDelete && !c.isCreate && (
-      <button
-        className="absolute top-2 right-2 text-red-500 hover:text-red-700 z-10"
-        onClick={(e) => {
-          e.stopPropagation(); // Don’t trigger card click
-          c.onDelete();
-        }}
-      >
-        <Trash2 size={18} />
-      </button>
-    )}
+            <button
+              className="absolute top-2 right-2 text-red-500 hover:text-red-700 z-10"
+              onClick={(e) => {
+                e.stopPropagation();
+                c.onDelete();
+              }}
+            >
+              <Trash2 size={18} />
+            </button>
+          )}
         </article>
       ))}
       <div className="chroma-overlay" />
