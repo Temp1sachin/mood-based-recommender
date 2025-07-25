@@ -1,15 +1,14 @@
-// This file should be at: app/(auth)/reset-password/page.js
-
-import { Suspense } from 'react';
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
- const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 // Icons
 import { Music, Key, Lock, ArrowRight, LoaderCircle } from 'lucide-react';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // This is the actual component with all your original logic.
 // It's now a separate component that can be wrapped in Suspense.
@@ -17,7 +16,6 @@ function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
-  // Your original state and logic are preserved
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -112,6 +110,7 @@ function ResetPasswordForm() {
     </div>
   );
 }
+
 
 // This is the main page component that Next.js will render.
 // It wraps our form in a <Suspense> boundary to fix the error.
