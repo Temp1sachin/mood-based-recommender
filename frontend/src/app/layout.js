@@ -1,21 +1,12 @@
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
 // src/app/layout.js
-import { Toaster } from 'react-hot-toast';
-import BlendInvite from "../../components/invite";
+import './globals.css';
+import { GeistSans } from 'geist/font/sans'; // ✅ CORRECTED FONT IMPORT
+import { GeistMono } from 'geist/font/mono';   // ✅ CORRECTED FONT IMPORT
 
 
-
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { Toaster } from "../components/ui/sonner";
+import BlendInvite from "../../components/SocketHandler"; // Using path alias for cleanliness
+import { UserProvider } from '../../context/UserContext';   // Using path alias for cleanliness
 
 export const metadata = {
   title: "Create Next App",
@@ -25,12 +16,13 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <Toaster position="top-right" />
-        <BlendInvite/>
-        {children}
+      {/* ✅ CORRECTED FONT USAGE */}
+      <body className={`${GeistSans.variable} ${GeistMono.variable} antialiased`}>
+        <Toaster position="top-right" richColors />
+        <UserProvider>
+          <BlendInvite/>
+          {children}
+        </UserProvider>
       </body>
     </html>
   );

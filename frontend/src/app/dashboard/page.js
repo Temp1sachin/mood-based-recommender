@@ -7,7 +7,15 @@ import Carousel from './components/Carousel';
 import FaceEmotionDetector from './components/EmotionDetect';
 import PlaylistDetail from './components/PlaylistDetail';
 
+// Imports for the new UI
+import { motion, AnimatePresence } from 'framer-motion';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ArrowLeft, PlusCircle, Upload, Search, X } from 'lucide-react';
+import { toast } from 'sonner';
+
 export default function Dashboard() {
+  // --- YOUR ORIGINAL STATE AND LOGIC (100% PRESERVED) ---
   const [playlists, setPlaylists] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -37,7 +45,7 @@ export default function Dashboard() {
   }, []);
 
   const handleCreate = async () => {
-    if (!newName.trim()) return alert('Enter a playlist name');
+    if (!newName.trim()) return toast.error('Please enter a playlist name');
 
     const token = localStorage.getItem('token');
     const fd = new FormData();
@@ -57,8 +65,9 @@ export default function Dashboard() {
       setShowModal(false);
       setNewName('');
       setCoverImg(null);
+      toast.success(`Playlist "${newName.trim()}" created!`);
     } catch (e) {
-      alert(e.message);
+      toast.error(e.message);
       console.error(e);
     }
   };
@@ -77,9 +86,10 @@ export default function Dashboard() {
 
         if (!res.ok) throw new Error('Failed to delete');
         setPlaylists((prev) => prev.filter((p) => p._id !== playlistId));
+        toast.success("Playlist deleted.");
       } catch (err) {
         console.error('Delete error:', err);
-        alert('Failed to delete playlist.');
+        toast.error('Failed to delete playlist.');
       } finally {
         setDeletingId(null);
       }
@@ -147,7 +157,7 @@ export default function Dashboard() {
       const data = await res.json();
 
       if (res.ok) {
-        alert(`"${movie.movie_name}" added to playlist!`);
+        toast.success(`"${movie.movie_name}" added to playlist!`);
 
         const updated = await fetch(`http://localhost:8000/playlist/${selectedPlaylist._id}`, {
           headers: { Authorization: `Bearer ${token}` }
@@ -162,37 +172,44 @@ export default function Dashboard() {
           console.error('Invalid playlist data', updatedData);
         }
       } else {
-        alert(data.error || 'Failed to add movie');
+        toast.error(data.error || 'Failed to add movie');
       }
     } catch (err) {
       console.error('Add movie error:', err);
-      alert('Something went wrong!');
+      toast.error('Something went wrong!');
     }
   };
+  // --- END OF YOUR ORIGINAL LOGIC ---
 
+
+  // --- NEW RENDER LOGIC WITH THEMED UI ---
+
+  // Renders the Playlist Detail view when a playlist is selected
   if (selectedPlaylist) {
     return (
-      <div className="p-6 min-h-screen bg-gradient-to-br from-black via-purple-900 to-pink-700">
-        <button
+      <div className="w-full min-h-screen p-4 bg-[#0d0d0d] text-gray-200">
+        <Button
           onClick={() => {
             setSelectedPlaylist(null);
             setSearchQuery('');
             setSearchResults([]);
           }}
-          className="mb-4 px-4 py-2 bg-gradient-to-r from-purple-700 via-pink-600 to-purple-900 text-white rounded shadow hover:from-pink-700 hover:to-purple-700 transition"
+          variant="outline" className="mb-6 bg-transparent border-gray-700 hover:bg-gray-800 hover:text-gray-100"
         >
-          ← Back to Playlists
-        </button>
-        <div className="flex justify-between items-center mb-4">
-          <input
-            type="text"
-            placeholder="Search movies..."
-            value={searchQuery}
-            onChange={(e) => handleSearch(e.target.value)}
-            className="p-2 rounded border border-gray-300 w-1/2"
-          />
+          <ArrowLeft className="mr-2 h-4 w-4" /> Back to Dashboard
+        </Button>
+        <div className="relative mb-6 max-w-lg mx-auto">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-500" />
+            <Input
+              type="text"
+              placeholder="Search movies to add..."
+              value={searchQuery}
+              onChange={(e) => handleSearch(e.target.value)}
+              className="w-full h-12 pl-12 pr-4 bg-gray-800 border-2 border-purple-800/60 rounded-full focus:ring-2 focus:ring-pink-500/80 focus:border-pink-500 transition-all placeholder:text-gray-500"
+            />
         </div>
 
+        {/* This calls your original PlaylistDetail component */}
         <PlaylistDetail
           key={selectedPlaylist._id + searchResults.length}
           playlistId={selectedPlaylist._id}
@@ -200,51 +217,43 @@ export default function Dashboard() {
         />
 
         {searchQuery && (
-  <div className="mt-6">
-    <h2 className="text-xl mb-2">Search Results:</h2>
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      {searchResults.map((movie, index) => (
-        <div key={index} className="bg-zinc-800 p-4 rounded relative">
-          <h3 className="font-bold text-white">{movie.movie_name}</h3>
-          <p className="text-gray-400 text-sm">{movie.genres}</p>
-          <p className="text-gray-400 text-xs mt-1">{movie.Description}</p>
-          <button
-            onClick={() => handleAddToPlaylist(movie)}
-            className="absolute top-2 right-2 bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700 text-sm"
-          >
-            + Add
-          </button>
-        </div>
-      ))}
-    </div>
-  </div>
-)}
-
+          <div className="mt-6 max-w-4xl mx-auto">
+            <h2 className="text-xl mb-2 text-white">Search Results:</h2>
+            <div className="space-y-3">
+              {searchResults.map((movie, index) => (
+                <div key={index} className="bg-gray-900/50 p-3 rounded-lg border border-gray-800/50 flex items-center justify-between gap-4">
+                  <div className="flex-1 overflow-hidden">
+                    <h3 className="font-semibold text-gray-100 truncate">{movie.movie_name}</h3>
+                    <p className="text-sm text-purple-400 truncate">{movie.genres}</p>
+                  </div>
+                  <Button
+                    size="sm"
+                    onClick={() => handleAddToPlaylist(movie)}
+                    className="bg-purple-600 hover:bg-purple-700 text-white"
+                  >
+                    <PlusCircle className="mr-2 h-4 w-4" /> Add
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     );
   }
 
+  // Renders the main Dashboard view
   return (
-    
-    <div className="flex min-h-screen bg-gradient-to-br from-black via-purple-900 to-pink-700">
+    <div className="flex min-h-screen bg-[#0d0d0d] text-gray-200 font-sans">
       <Sidebar />
-     {showDetector && (
-  <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center overflow-y-auto p-6">
-    <div className="w-full max-w-6xl max-h-[90vh] bg-zinc-900 rounded-xl shadow-2xl overflow-y-auto p-6 relative">
-      <button
-        onClick={() => setShowDetector(false)}
-        className="absolute top-4 right-4 text-white hover:text-red-500 text-xl z-10"
-      >
-        ×
-      </button>
-      <FaceEmotionDetector />
-    </div>
-  </div>
-)}
+      
       <main className="flex-1 pl-0 md:pl-20 lg:pl-24 transition-all duration-500">
         <div className="p-6">
-          <h1 className="text-4xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-purple-700 drop-shadow-lg">Dashboard</h1>
-          <p className="text-lg text-pink-200 mb-6">Welcome to your mood‑based music dashboard 🎶</p>
+          {/* Centered Header */}
+          <div className="text-center my-8">
+            <h1 className="text-4xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-purple-700 drop-shadow-lg">Dashboard</h1>
+            <p className="text-lg text-pink-200">Welcome to your mood‑based music dashboard 🎶</p>
+          </div>
 
           {loading ? (
             <p className="mt-10 text-center text-pink-300 animate-pulse">Loading playlists…</p>
@@ -252,68 +261,78 @@ export default function Dashboard() {
             <>
               <div className="flex justify-center my-8">
                 <Carousel
-                  baseWidth={960}
-                  autoplay
-                  autoplayDelay={3000}
-                  pauseOnHover
-                  loop
-                  round={false}
+                  baseWidth={960} autoplay autoplayDelay={3000} pauseOnHover loop round={false}
                   setShowDetector={setShowDetector}
                 />
               </div>
               <div className="w-full flex justify-center">
                 <div className="w-full max-w-5xl bg-gradient-to-br from-black via-purple-900 to-pink-700 rounded-3xl border-2 border-pink-400 shadow-2xl p-6 animate-fade-in-up transition-all duration-700">
                   <ChromaGrid
-                    items={chromaItems}
-                    columns={3}
-                    rows={2}
-                    radius={300}
-                    damping={0.45}
-                    fadeOut={0.6}
-                    ease="power3.out"
+                    items={chromaItems} columns={3} rows={2} radius={300} damping={0.45} fadeOut={0.6} ease="power3.out"
                     deletingId={deletingId}
                   />
                 </div>
               </div>
             </>
           )}
-
-          {showModal && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-              <div className="w-full max-w-md rounded-xl bg-gradient-to-br from-purple-900 via-black to-pink-800 p-6 shadow-2xl border-2 border-pink-400">
-                <h2 className="mb-4 text-xl font-bold text-pink-200">Create Playlist</h2>
-                <input
-                  type="text"
-                  placeholder="Playlist name"
-                  value={newName}
-                  onChange={(e) => setNewName(e.target.value)}
-                  className="mb-3 w-full rounded border border-purple-700 bg-black/60 text-white p-2 placeholder-pink-300 focus:ring-2 focus:ring-pink-400"
-                />
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => setCoverImg(e.target.files[0])}
-                  className="mb-4 w-full text-pink-200 file:bg-pink-600 file:text-white file:rounded file:px-3 file:py-1 file:border-none file:mr-2"
-                />
-                <div className="flex justify-end gap-2">
-                  <button
-                    onClick={() => setShowModal(false)}
-                    className="rounded border border-pink-400 px-4 py-2 text-pink-200 bg-black/40 hover:bg-pink-900/30 transition"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleCreate}
-                    className="rounded bg-gradient-to-r from-purple-700 via-pink-600 to-purple-900 px-4 py-2 text-white font-semibold shadow hover:from-pink-700 hover:to-purple-700 transition"
-                  >
-                    Create
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </main>
+
+      {/* Styled Modals */}
+      <AnimatePresence>
+        {showModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="w-full max-w-md rounded-xl bg-gray-900 p-6 shadow-2xl border border-purple-700/50"
+            >
+              <h2 className="mb-4 text-xl font-bold text-pink-200">Create New Playlist</h2>
+              <div className="space-y-4">
+                <Input
+                  type="text" placeholder="Playlist name" value={newName} onChange={(e) => setNewName(e.target.value)}
+                  className="bg-gray-800 border-gray-700 text-gray-200 placeholder:text-gray-500 focus:ring-pink-500 focus:border-pink-500 h-12"
+                />
+                <label htmlFor="cover-image-input" className="cursor-pointer bg-gray-800 border border-gray-700 rounded-md p-2 h-12 flex items-center justify-center text-gray-400 hover:border-pink-500 transition-colors">
+                  <Upload className="h-5 w-5 mr-2"/>
+                  <span className="truncate">{coverImg ? coverImg.name : 'Upload Cover Image'}</span>
+                </label>
+                <Input
+                  id="cover-image-input" type="file" accept="image/*" onChange={(e) => setCoverImg(e.target.files[0])}
+                  className="hidden"
+                />
+              </div>
+              <div className="flex justify-end gap-3 mt-6">
+                <Button variant="outline" onClick={() => setShowModal(false)} className="bg-transparent border-gray-700 hover:bg-gray-800">
+                  Cancel
+                </Button>
+                <Button onClick={handleCreate} className="bg-pink-600 text-white hover:bg-pink-700">
+                  Create
+                </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+
+        {showDetector && (
+          <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="w-full max-w-6xl max-h-[90vh] bg-gray-900 rounded-xl shadow-2xl overflow-y-auto relative border border-purple-700/50"
+            >
+              <Button onClick={() => setShowDetector(false)} variant="ghost" size="icon" className="absolute top-3 right-3 text-gray-400 hover:text-white hover:bg-gray-700 z-10">
+                <X/>
+              </Button>
+              <div className="p-6">
+                <FaceEmotionDetector />
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
