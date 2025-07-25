@@ -2,7 +2,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import * as faceapi from 'face-api.js';
 import '@tensorflow/tfjs';
-
+ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const FaceEmotionDetector = () => {
   const videoRef = useRef(null);
   const [expression, setExpression] = useState(null);
@@ -59,7 +59,7 @@ const FaceEmotionDetector = () => {
   const getRecommendations = async (faceEmotion) => {
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:8000/detect', {
+      const res = await fetch(`${API_URL}/detect`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ emotion: faceEmotion }),

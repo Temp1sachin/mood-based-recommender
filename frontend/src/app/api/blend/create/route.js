@@ -1,7 +1,7 @@
 
 import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
-
+ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 // This explicitly tells Next.js not to cache this route.
 export const dynamic = 'force-dynamic';
 
@@ -17,7 +17,7 @@ export async function POST(request) {
     }
 
     // 2. Forward the request to your actual backend server
-    const response = await fetch('http://localhost:8000/blend/create-room', {
+    const response = await fetch(`${API_URL}/blend/create-room`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -5,7 +5,7 @@ import {
 } from "react-icons/fi";
 import "./Carousel.css";
 import MovieCard from "./MovieCard";
-
+ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 // Mood to Emotion map (used for backend compatibility)
 const moodToEmotion = {
   joy: "joy",
@@ -136,7 +136,7 @@ export default function Carousel({
     onMoodSelect?.(emotionLabel);
 
     try {
-      const response = await fetch('http://localhost:8000/mood/recommend', {
+      const response = await fetch(`${API_URL}/mood/recommend`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ emotion: emotionLabel }),

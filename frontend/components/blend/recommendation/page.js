@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Users, Cpu, Plus, Film, LoaderCircle } from 'lucide-react';
 import { toast } from 'sonner';
+ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 // A simple, themed loading spinner
 const LoadingSpinner = () => (
   <div className="flex justify-center items-center p-12">
@@ -36,7 +37,7 @@ const RecommendationsPage = () => {
   const fetchFriendRecs = async () => {
     setFriendLoading(true);
     try {
-      const res = await axios.get(`http://localhost:8000/blend/${roomId}/internal-recommendations`, {
+      const res = await axios.get(`${API_URL}/blend/${roomId}/internal-recommendations`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setFriendRecs(res.data.recommendations);
@@ -52,7 +53,7 @@ const RecommendationsPage = () => {
   const fetchAiRecs = async () => {
     setAiLoading(true);
     try {
-      const res = await axios.post(`http://localhost:8000/blend/${roomId}/ai-recommendations`, {}, {
+      const res = await axios.post(`${API_URL}/blend/${roomId}/ai-recommendations`, {}, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setAiRecs(res.data.recommendations.map(title => ({ title, genres: ['AI Suggestion'] })));

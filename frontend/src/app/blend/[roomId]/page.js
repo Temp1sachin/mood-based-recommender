@@ -8,7 +8,7 @@ import { UserContext } from '../../../../context/UserContext';
 import ChatPage from '../../../../components/blend/chat/page';
 import PlaylistManager from '../../../../components/blend/playlist/page';
 import RecommendationsPage from '../../../../components/blend/recommendation/page';
-
+ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 // Import UI components
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -65,7 +65,7 @@ export default function BlendRoom() {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:8000/api/auth/search?email=${email}`, {
+      const res = await fetch(`${API_URL}/api/auth/search?email=${email}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -94,7 +94,7 @@ export default function BlendRoom() {
   const handleLeaveRoom = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:8000/blend/leave', {
+      const res = await fetch(`${API_URL}/blend/leave`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

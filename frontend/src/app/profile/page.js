@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ListMusic, Heart, LoaderCircle } from 'lucide-react';
 import Image from 'next/image';
-
+ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const LoadingSpinner = () => (
     <div className="flex flex-col justify-center items-center min-h-screen bg-[#0d0d0d] text-center">
         <LoaderCircle className="w-10 h-10 text-purple-400 animate-spin mb-4" />
@@ -27,7 +27,7 @@ export default function ProfilePage() {
           return;
       }
       try {
-        const res = await fetch('http://localhost:8000/api/auth/profile', {
+        const res = await fetch(`${API_URL}/api/auth/profile`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

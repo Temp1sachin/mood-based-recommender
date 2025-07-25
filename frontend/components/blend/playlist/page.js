@@ -14,7 +14,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PlusCircle, Upload } from 'lucide-react';
-
+ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const PlaylistManager = () => {
   // --- YOUR ORIGINAL STATE AND LOGIC (100% PRESERVED) ---
   const { roomId } = useParams();
@@ -50,7 +50,7 @@ const PlaylistManager = () => {
 
   const fetchRoomPlaylists = async () => {
     try {
-      const res = await axios.get(`http://localhost:8000/blend/${roomId}`, {
+      const res = await axios.get(`${API_URL}/blend/${roomId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setPlaylists(res.data.room.playlist);
@@ -70,7 +70,7 @@ const PlaylistManager = () => {
     formData.append('name', newPlaylistName);
     formData.append('coverImage', newPlaylistCover);
     try {
-      await axios.post("http://localhost:8000/blend/playlist/create", formData, {
+      await axios.post(`${API_URL}/blend/playlist/create`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,

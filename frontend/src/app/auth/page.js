@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
-
+ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 // Icons
 import { Music, User, Mail, Lock, Upload, ArrowRight } from 'lucide-react';
 
@@ -44,13 +44,13 @@ export default function Auth() {
             formData.append('profilePic', form.profilePic);
         }
 
-        res = await fetch('http://localhost:8000/api/auth/signup', {
+        res = await fetch(`${API_URL}/api/auth/signup`, {
           method: 'POST',
           body: formData,
         });
         
       } else {
-        res = await fetch('http://localhost:8000/api/auth/login', {
+        res = await fetch(`${API_URL}/api/auth/login`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

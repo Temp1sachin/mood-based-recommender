@@ -1,7 +1,7 @@
 // lib/socket.js
 import { io } from 'socket.io-client';
-
-const socket = io('http://localhost:8000', {
+ const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const socket = io(`${API_URL}`, {
   transports: ['websocket'],
 });
 
