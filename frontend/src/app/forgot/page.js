@@ -21,7 +21,7 @@ export default function ForgotPasswordPage() {
     }
     setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/auth/forgot-password`, {
+      const res = await fetch(`${API_URL}/api/auth/reset`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
@@ -32,7 +32,7 @@ export default function ForgotPasswordPage() {
       if (res.ok) {
         toast.success(data.message || 'If an account with that email exists, a reset link has been sent.');
         // Optionally redirect the user or clear the form
-        // router.push('/auth');
+        router.push(`/reset?email=${encodeURIComponent(email)}`);
       } else {
         toast.error(data.message || 'Failed to send reset link.');
       }
