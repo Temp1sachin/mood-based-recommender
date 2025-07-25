@@ -127,9 +127,7 @@ export default function Carousel({
     setShowDetector?.(true);
   }, [setShowDetector]);
 
-  const handleQuestionnaireClick = useCallback(() => {
-    alert("Questionnaire coming soon!");
-  }, []);
+ 
 
   const handleMoodSelect = useCallback(async (mood) => {
     const emotionLabel = moodToEmotion[mood] || mood;
@@ -162,7 +160,7 @@ export default function Carousel({
       return (
         <div className="mood-detection-buttons">
           <button onClick={handleCameraClick}>Detect via Camera</button>
-          <button onClick={handleQuestionnaireClick}>Answer Questionnaire</button>
+          
         </div>
       );
     } else {
@@ -175,7 +173,7 @@ export default function Carousel({
         </div>
       );
     }
-  }, [handleCameraClick, handleQuestionnaireClick, handleMoodSelect]);
+  }, [handleCameraClick, handleMoodSelect]);
 
   return (
     <div

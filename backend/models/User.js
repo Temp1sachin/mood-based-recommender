@@ -21,6 +21,7 @@ const userSchema = new mongoose.Schema({
   accessToken: { type: String },
   profilePic: { type: String }, 
   playlists: [playlistSchema],
+  favorites: [movieSchema],
   otp: String,
   otpExpires: Date,
   isVerified: { type: Boolean, default: false },

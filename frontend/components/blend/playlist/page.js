@@ -87,10 +87,10 @@ const PlaylistManager = () => {
   };
 
   const deletePlaylist = (playlistId) => {
-    if (window.confirm("Are you sure you want to delete this playlist?")) {
+    
       socket.emit('delete-playlist', { roomId, playlistId });
       toast.success("Playlist deleted.");
-    }
+    
   };
 
   const addMovieToPlaylist = (playlistId, movie) => {
@@ -113,14 +113,14 @@ const PlaylistManager = () => {
   };
 
   const deleteMovieFromPlaylist = (playlistId, movieId) => {
-    if (window.confirm("Are you sure you want to remove this movie?")) {
+    
       socket.emit('playlist-delete-movie', {
         roomId,
         playlistId,
         movieId,
       });
       toast.success("Movie removed from playlist.");
-    }
+    
   };
   // --- END OF YOUR ORIGINAL LOGIC ---
 

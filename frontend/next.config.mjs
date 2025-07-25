@@ -16,6 +16,12 @@ export default {
         port: '',
         pathname: '/**', // This allows any path from the specified hostname
       },
+       {
+        protocol: 'https',
+        hostname: 'via.placeholder.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
 };

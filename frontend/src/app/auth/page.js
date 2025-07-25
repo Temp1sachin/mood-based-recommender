@@ -99,7 +99,7 @@ export default function Auth() {
                 <Music size={48} className="text-pink-500" />
             </div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-                Welcome to Blend
+                Welcome to MoodyBlu
             </h1>
             <p className="text-gray-400 mt-2">{isSignup ? 'Create your account to start blending.' : 'Login to continue your session.'}</p>
         </div>
