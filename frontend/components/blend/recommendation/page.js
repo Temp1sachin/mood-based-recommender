@@ -10,7 +10,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Users, Cpu, Plus, Film, LoaderCircle } from 'lucide-react';
 import { toast } from 'sonner';
- const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+// Get the API URL from the environment variable
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 // A simple, themed loading spinner
 const LoadingSpinner = () => (
   <div className="flex justify-center items-center p-12">
@@ -22,7 +25,6 @@ const RecommendationsPage = () => {
   const { roomId } = useParams();
   const [token, setToken] = useState('');
   
-  // Your original state is preserved
   const [friendRecs, setFriendRecs] = useState([]);
   const [aiRecs, setAiRecs] = useState([]);
   const [friendLoading, setFriendLoading] = useState(false);
@@ -33,7 +35,6 @@ const RecommendationsPage = () => {
     if (storedToken) setToken(storedToken);
   }, []);
 
-  // Your original fetching functions are preserved
   const fetchFriendRecs = async () => {
     setFriendLoading(true);
     try {
@@ -43,7 +44,6 @@ const RecommendationsPage = () => {
       setFriendRecs(res.data.recommendations);
     } catch (err) {
       console.error(err);
-      // Consider using a toast notification instead of alert for better UX
       toast.error("Could not load recommendations from friends.");
     } finally {
       setFriendLoading(false);
@@ -59,13 +59,12 @@ const RecommendationsPage = () => {
       setAiRecs(res.data.recommendations.map(title => ({ title, genres: ['AI Suggestion'] })));
     } catch (err) {
       console.error(err);
-      toast.error(err.response?.data?.message || "Could not get AI recommendations."); // Changed from alert
+      toast.error(err.response?.data?.message || "Could not get AI recommendations.");
     } finally {
       setAiLoading(false);
     }
   };
   
-  // Your original socket function is preserved
   const addMovieToBlend = (movie) => {
     socket.emit('playlist-add-movie', {
       roomId,
@@ -77,11 +76,9 @@ const RecommendationsPage = () => {
         genres: movie.genres,
       },
     });
-    // Consider using a toast notification for a less disruptive message
-    toast.success(`Added "${movie.title}" to the blend!`);
+    toast.success(`"${movie.title}" was added to the blend!`);
   };
 
-  // The rendering logic is now restyled into animated cards
   const renderRecs = (recs, isLoading) => {
     if (isLoading) return <LoadingSpinner />;
     if (recs.length === 0) return (
@@ -132,7 +129,7 @@ const RecommendationsPage = () => {
         <h1 className="text-3xl font-bold bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 bg-clip-text text-transparent mb-2">
           Get Recommendations
         </h1>
-        <p className="text-gray-500">Discover media based on your group's taste or from our AI.</p>
+        <p className="text-gray-500">{"Discover media based on your group's taste or from our AI."}</p>
       </div>
 
       <Tabs defaultValue="friends" className="w-full max-w-4xl mx-auto">
@@ -151,7 +148,8 @@ const RecommendationsPage = () => {
               <h2 className="text-xl font-bold text-gray-200">Discover Movies from Your Group</h2>
               <p className="text-gray-400 my-2">See what movies are popular in your friends' personal playlists.</p>
               <Button onClick={fetchFriendRecs} disabled={friendLoading} className="bg-pink-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-pink-700 disabled:opacity-50 mt-2">
-                {friendLoading ? 'Loading...' : 'Fetch Friends\' Picks'}
+                {/* 👇 FIX: Escaped the apostrophe to prevent compilation errors */}
+                {friendLoading ? 'Loading...' : "Fetch Friends' Picks"}
               </Button>
               {renderRecs(friendRecs, friendLoading)}
             </CardContent>

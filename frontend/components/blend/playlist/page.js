@@ -187,7 +187,7 @@ const PlaylistManager = () => {
         {/* Playlists Grid - Renders your original PlaylistCard component */}
         <AnimatePresence>
           {playlists.length === 0 ? (
-            <p className="text-center text-gray-500 py-10">You haven't created any playlists yet.</p>
+            <p className="text-center text-gray-500 py-10">{"You haven't created any playlists yet."}</p>
           ) : (
             <motion.div 
               className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
