@@ -11,7 +11,7 @@ const recommendHandler = require('./routes/Recmmend');
 const BlendInvite = require('./models/BlendInvite');
 const BlendRoom = require('./models/BlendRoom');
 const User = require('./models/User');
-
+const favouriteRoutes = require('./routes/favourite'); // ⬅️ NEW
 const app = express();
 const server = http.createServer(app); // ⬅️ use HTTP server for Socket.io
 
@@ -322,8 +322,8 @@ app.use('/detect', EmoMovies);
 app.use('/playlist', playlist);
 app.use('/blend', blendRoutes);
 app.use('/mood', recommendHandler);
-
-mongoose.connect('mongodb://localhost:27017/moodapp')
+app.use('/favorites', favouriteRoutes); // ⬅️ NEW
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB connected'))
   .catch(err => console.log(err));
 

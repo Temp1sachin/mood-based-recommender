@@ -366,14 +366,25 @@ router.get('/:roomId/internal-recommendations', verifyToken, async (req, res) =>
     const room = await BlendRoom.findOne({ roomId }).populate('playlist.movies');
     if (!room) return res.status(404).json({ message: 'Blend Room not found.' });
 
+    // Fetch participants and their playlists. Favorites are included by default.
     const participants = await User.find({ _id: { $in: room.participants } }).populate('playlists.movies');
-    const allFriendMovies = participants.flatMap(user => user.playlists.flatMap(pl => pl.movies));
-
-    const uniqueMoviesMap = new Map();
-    allFriendMovies.forEach(movie => {
-      if (!uniqueMoviesMap.has(movie.title)) uniqueMoviesMap.set(movie.title, movie);
+    
+    // 👇 THE FIX: Combine movies from both playlists AND favorites
+    const allFriendMovies = participants.flatMap(user => {
+      const playlistMovies = user.playlists.flatMap(pl => pl.movies);
+      const favoriteMovies = user.favorites || []; // Get favorite movies, default to empty array
+      return [...playlistMovies, ...favoriteMovies]; // Combine them
     });
 
+    // The rest of your logic for finding unique movies remains the same
+    const uniqueMoviesMap = new Map();
+    allFriendMovies.forEach(movie => {
+      if (movie && movie.title && !uniqueMoviesMap.has(movie.title)) {
+        uniqueMoviesMap.set(movie.title, movie);
+      }
+    });
+
+    // The rest of your logic for filtering out movies already in the blend remains the same
     const blendPlaylistMovieTitles = new Set(room.playlist.flatMap(pl => pl.movies.map(m => m.title)));
     const finalRecs = Array.from(uniqueMoviesMap.values()).filter(movie => !blendPlaylistMovieTitles.has(movie.title));
 

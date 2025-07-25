@@ -73,13 +73,12 @@ export default function Dashboard() {
   };
 
   const handleDelete = async (playlistId) => {
-    if (!confirm('Are you sure you want to delete this playlist?')) return;
 
     setDeletingId(playlistId);
     setTimeout(async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`http://localhost:8000/playlist/${playlistId}`, {
+        const res = await fetch(`http://localhost:8000/playlist/${playlistId}/delete`, {
           method: 'DELETE',
           headers: { Authorization: `Bearer ${token}` }
         });
