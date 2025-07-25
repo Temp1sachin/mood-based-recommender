@@ -146,7 +146,7 @@ const RecommendationsPage = () => {
           <Card className="bg-transparent border-none mt-4">
             <CardContent className="text-center p-4 md:p-6">
               <h2 className="text-xl font-bold text-gray-200">Discover Movies from Your Group</h2>
-              <p className="text-gray-400 my-2">See what movies are popular in your friends' personal playlists.</p>
+              <p className="text-gray-400 my-2">{"See what movies are popular in your friends' personal playlists."}</p>
               <Button onClick={fetchFriendRecs} disabled={friendLoading} className="bg-pink-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-pink-700 disabled:opacity-50 mt-2">
                 {/* 👇 FIX: Escaped the apostrophe to prevent compilation errors */}
                 {friendLoading ? 'Loading...' : "Fetch Friends' Picks"}
@@ -160,7 +160,7 @@ const RecommendationsPage = () => {
           <Card className="bg-transparent border-none mt-4">
             <CardContent className="text-center p-4 md:p-6">
               <h2 className="text-xl font-bold text-gray-200">Get New Ideas from Gemini</h2>
-              <p className="text-gray-400 my-2">Let our AI analyze your group's taste and suggest something entirely new.</p>
+              <p className="text-gray-400 my-2">{"Let our AI analyze your group's taste and suggest something entirely new."}</p>
               <Button onClick={fetchAiRecs} disabled={aiLoading} className="bg-purple-600 text-white px-6 py-2 rounded-full font-semibold hover:bg-purple-700 disabled:opacity-50 mt-2">
                 {aiLoading ? 'Thinking...' : 'Ask Gemini'}
               </Button>
