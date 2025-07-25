@@ -138,7 +138,7 @@ export default function Carousel({
     onMoodSelect?.(emotionLabel);
 
     try {
-      const response = await fetch('http://localhost:8000/api/recommend', {
+      const response = await fetch('http://localhost:8000/mood/recommend', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ emotion: emotionLabel }),
