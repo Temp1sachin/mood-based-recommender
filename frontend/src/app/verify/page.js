@@ -1,25 +1,26 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
- const API_URL = process.env.NEXT_PUBLIC_API_URL;
-// Icons
-import { Music, Key, Mail, ArrowRight } from 'lucide-react';
 
-export default function OTPVerificationPage() {
+// Icons
+import { Music, Key, Mail, ArrowRight, LoaderCircle } from 'lucide-react';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+// This is the actual component with all your original logic.
+function OTPVerificationForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
-  // Your original state and logic are preserved
   const emailFromQuery = searchParams.get('email') || '';
   const [email, setEmail] = useState(emailFromQuery);
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Set email from URL query on initial render
   useEffect(() => {
     if (emailFromQuery) {
         setEmail(emailFromQuery);
@@ -102,3 +103,17 @@ export default function OTPVerificationPage() {
     </div>
   );
 }
+
+// This is the main page component that Next.js will render.
+// It wraps our form in a <Suspense> boundary to fix the error.
+export default function OTPVerificationPage() {
+    return (
+      <Suspense fallback={
+          <div className="flex justify-center items-center min-h-screen bg-[#0d0d0d]">
+              <LoaderCircle className="w-10 h-10 text-purple-400 animate-spin" />
+          </div>
+      }>
+        <OTPVerificationForm />
+      </Suspense>
+    );
+  }
