@@ -92,7 +92,7 @@ const PlaylistDetail = ({
           <div className="text-center text-gray-500 py-16">
             <Film className="mx-auto h-12 w-12 mb-4" />
             <h3 className="text-xl font-semibold">This playlist is empty</h3>
-            <p>Click "Add Movies" to get started!</p>
+            <p>{'Click "Add Movies" to get started!'}</p>
           </div>
         ) : (
           <motion.div 

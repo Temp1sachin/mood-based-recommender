@@ -51,7 +51,7 @@ export default function Home() {
           variants={itemVariants}
           className="text-lg md:text-xl text-purple-200/80 mb-10"
         >
-          Discover music and movies that perfectly match your vibe. Our AI analyzes your mood to recommend content you'll love.
+          {"Discover music and movies that perfectly match your vibe. Our AI analyzes your mood to recommend content you'll love."}
         </motion.p>
 
         {/* Blend Feature Section with improved responsiveness and hover animation */}
@@ -65,7 +65,7 @@ export default function Home() {
             <div>
                 <h2 className="text-xl font-bold text-white">Collaborate with Blend</h2>
                 <p className="text-gray-400 mt-1">
-                    Create a 'Blend' room to build shared playlists with friends in real-time and get recommendations based on your combined tastes.
+                    {"Create a 'Blend' room to build shared playlists with friends in real-time and get recommendations based on your combined tastes."}
                 </p>
             </div>
         </motion.div>
