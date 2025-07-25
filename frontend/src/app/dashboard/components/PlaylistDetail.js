@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import MovieCard from './MovieCard';
-
+ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function PlaylistDetail({ playlistId, playlistName, onBack }) {
   const [movies, setMovies] = useState([]);
@@ -11,7 +11,7 @@ export default function PlaylistDetail({ playlistId, playlistName, onBack }) {
   const fetchMovies = async () => {
     const token = localStorage.getItem('token');
     try {
-      const res = await fetch(`http://localhost:8000/playlist/${playlistId}/movies`, {
+      const res = await fetch(`${API_URL}/playlist/${playlistId}/movies`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

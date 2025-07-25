@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Plus, Search, LoaderCircle } from 'lucide-react';
-
+ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 // A simple, themed loading spinner
 const LoadingSpinner = () => (
   <div className="flex flex-col justify-center items-center p-12 text-center">
@@ -23,11 +23,10 @@ const MovieSearch = ({ playlist, onAddMovie, onBack, token }) => {
   const [filteredMovies, setFilteredMovies] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const res = await axios.get('http://localhost:8000/playlist/movie/data', {
+        const res = await axios.get(`${API_URL}/playlist/movie/data`, {
             headers: { Authorization: `Bearer ${token}` }
         });
         setAllMovies(res.data);

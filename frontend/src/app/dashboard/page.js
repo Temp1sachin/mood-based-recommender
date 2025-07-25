@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, PlusCircle, Upload, Search, X } from 'lucide-react';
 import { toast } from 'sonner';
-
+ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 export default function Dashboard() {
   // --- YOUR ORIGINAL STATE AND LOGIC (100% PRESERVED) ---
   const [playlists, setPlaylists] = useState([]);
@@ -31,7 +31,7 @@ export default function Dashboard() {
     (async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch('http://localhost:8000/playlist/all', {
+        const res = await fetch(`${API_URL}/playlist/all`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         const data = await res.json();
@@ -53,7 +53,7 @@ export default function Dashboard() {
     if (coverImg) fd.append('coverImage', coverImg);
 
     try {
-      const r = await fetch('http://localhost:8000/playlist/create', {
+      const r = await fetch(`${API_URL}/playlist/create`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: fd
@@ -78,7 +78,7 @@ export default function Dashboard() {
     setTimeout(async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`http://localhost:8000/playlist/${playlistId}/delete`, {
+        const res = await fetch(`${API_URL}/playlist/${playlistId}/delete`, {
           method: 'DELETE',
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -120,7 +120,7 @@ export default function Dashboard() {
       return;
     }
     try {
-      const res = await fetch('http://localhost:8000/playlist/movie/data', {
+      const res = await fetch(`${API_URL}/playlist/movie/data`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
@@ -137,7 +137,7 @@ export default function Dashboard() {
     const token = localStorage.getItem('token');
     try {
       const res = await fetch(
-        `http://localhost:8000/playlist/${selectedPlaylist._id}/add-movie`,
+        `${API_URL}/playlist/${selectedPlaylist._id}/add-movie`,
         {
           method: 'POST',
           headers: {
@@ -158,7 +158,7 @@ export default function Dashboard() {
       if (res.ok) {
         toast.success(`"${movie.movie_name}" added to playlist!`);
 
-        const updated = await fetch(`http://localhost:8000/playlist/${selectedPlaylist._id}`, {
+        const updated = await fetch(`${API_URL}/playlist/${selectedPlaylist._id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         const updatedData = await updated.json();

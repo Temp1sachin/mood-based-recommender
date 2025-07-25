@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 export const UserContext = createContext({ user: null, loading: true });
-
+ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -16,7 +16,7 @@ export const UserProvider = ({ children }) => {
         return;
       }
       try {
-        const res = await fetch('http://localhost:8000/api/auth/profile', {
+        const res = await fetch(`${API_URL}/api/auth/profile`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

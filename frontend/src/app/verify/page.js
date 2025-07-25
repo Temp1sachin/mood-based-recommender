@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import axios from 'axios';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
-
+ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 // Icons
 import { Music, Key, Mail, ArrowRight } from 'lucide-react';
 
@@ -31,7 +31,7 @@ export default function OTPVerificationPage() {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post('http://localhost:8000/api/auth/verify-otp', {
+      const res = await axios.post(`${API_URL}/api/auth/verify-otp`, {
         email,
         otp
       });

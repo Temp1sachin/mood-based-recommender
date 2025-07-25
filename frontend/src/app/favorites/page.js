@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import Image from 'next/image';
 import { Heart, Trash2, LoaderCircle, ArrowLeft } from 'lucide-react'; // Import ArrowLeft
 import { Button } from '@/components/ui/button'; // Import Button for consistency
-
+ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 // A simple, themed loading spinner
 const LoadingSpinner = () => (
   <div className="flex justify-center items-center p-12">
@@ -36,7 +36,7 @@ export default function FavoritesPage() {
     const fetchFavorites = async () => {
       if (!token) return;
       try {
-        const res = await axios.get('http://localhost:8000/favorites', {
+        const res = await axios.get(`${API_URL}/favorites`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setFavorites(res.data.favorites);
@@ -54,7 +54,7 @@ export default function FavoritesPage() {
     if (!token) return toast.error("You are not logged in.");
     try {
       // Note the updated URL to include the movieId
-      const res = await axios.delete(`http://localhost:8000/favorites/remove/${movieId}`, {
+      const res = await axios.delete(`${API_URL}/favorites/remove/${movieId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setFavorites(res.data.favorites); // Update state with the new list from the server

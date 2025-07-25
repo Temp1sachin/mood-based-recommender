@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import ChromaGrid from "./ChromaGrid"; // Make sure path is correct
-
+ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 export default function PlaylistPage() {
   const [playlists, setPlaylists] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -13,7 +13,7 @@ export default function PlaylistPage() {
     const fetchPlaylists = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch('http://localhost:8000/playlist/all', {
+        const res = await fetch(`${API_URL}/playlist/all`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
@@ -34,7 +34,7 @@ export default function PlaylistPage() {
     if (coverImage) formData.append('coverImage', coverImage);
 
     try {
-      const res = await fetch('http://localhost:8000/playlist/create', {
+      const res = await fetch(`${API_URL}/playlist/create`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { Trash2, Heart } from 'lucide-react'; // Import the Heart icon
-
+ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 export default function MovieCard({ movie, playlistId, onDelete }) {
   // State to track if the movie is favorited, for instant UI feedback
   const [isFavorited, setIsFavorited] = useState(false);
@@ -15,7 +15,7 @@ export default function MovieCard({ movie, playlistId, onDelete }) {
     const token = localStorage.getItem('token');
     try {
       const res = await fetch(
-        `http://localhost:8000/playlist/${playlistId}/movie/${movie._id}/delete`,
+        `${API_URL}/playlist/${playlistId}/movie/${movie._id}/delete`,
         {
           method: 'DELETE',
           headers: { Authorization: `Bearer ${token}` },
@@ -43,7 +43,7 @@ export default function MovieCard({ movie, playlistId, onDelete }) {
     }
 
     try {
-      const res = await fetch('http://localhost:8000/favorites/add', {
+      const res = await fetch(`${API_URL}/favorites/add`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -12,7 +12,7 @@ const formatTime = (isoString) => {
   if (!isoString) return '';
   return new Date(isoString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 };
-
+ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 const GeminiLoadingIndicator = () => (
   <motion.div
     className="flex items-center gap-3 p-2 ml-2"
@@ -55,7 +55,7 @@ const Chat = () => {
     if (!roomId || !token || initialFetchDone.current) return;
     const fetchChatHistory = async () => {
       try {
-        const res = await axios.get(`http://localhost:8000/blend/${roomId}`, {
+        const res = await axios.get(`${API_URL}/blend/${roomId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (res.data.room && res.data.room.chatHistory) {
@@ -121,7 +121,7 @@ const Chat = () => {
     socket.emit('chat-message', chatData);
 
     try {
-      await axios.post('http://localhost:8000/blend/chat/message', { roomId, message }, {
+      await axios.post(`${API_URL}/blend/chat/message`, { roomId, message }, {
         headers: { Authorization: `Bearer ${token}` }
       });
     } catch (err) {
