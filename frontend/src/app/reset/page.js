@@ -1,3 +1,6 @@
+// This file should be at: app/(auth)/reset-password/page.js
+
+import { Suspense } from 'react';
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -6,9 +9,11 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
  const API_URL = process.env.NEXT_PUBLIC_API_URL;
 // Icons
-import { Music, Key, Lock, ArrowRight } from 'lucide-react';
+import { Music, Key, Lock, ArrowRight, LoaderCircle } from 'lucide-react';
 
-export default function ResetPasswordPage() {
+// This is the actual component with all your original logic.
+// It's now a separate component that can be wrapped in Suspense.
+function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -105,5 +110,19 @@ export default function ResetPasswordPage() {
         </form>
       </motion.div>
     </div>
+  );
+}
+
+// This is the main page component that Next.js will render.
+// It wraps our form in a <Suspense> boundary to fix the error.
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={
+        <div className="flex justify-center items-center min-h-screen bg-[#0d0d0d]">
+            <LoaderCircle className="w-10 h-10 text-purple-400 animate-spin" />
+        </div>
+    }>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }
