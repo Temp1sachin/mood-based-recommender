@@ -132,6 +132,36 @@ router.get('/profile', verifyToken, async (req, res) => {
   }
 });
 
+router.put('/update-picture', verifyToken, upload.single('profilePic'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ msg: 'No file uploaded.' });
+        }
+        
+        const profilePicUrl = req.file.path; // URL from Cloudinary (via multer config)
+
+        const updatedUser = await User.findByIdAndUpdate(
+            req.userId,
+            { profilePic: profilePicUrl },
+            { new: true }
+        ).select('-password');
+
+        if (!updatedUser) {
+            return res.status(404).json({ msg: 'User not found.' });
+        }
+
+        res.json({
+            success: true,
+            profilePicUrl: updatedUser.profilePic,
+            msg: 'Profile picture updated successfully.',
+        });
+
+    } catch (err) {
+        console.error('Update picture error:', err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
 router.get('/search', verifyToken, async (req, res) => {
   const { email } = req.query;
 
