@@ -8,7 +8,7 @@ const TMDB_API_KEY = process.env.TMDB_API_KEY;
 const recommendHandler = async (req, res) => {
   try {
     const { emotion } = req.body;
-
+    const isHighIntensity = req.isHighIntensity || false;
     if (!emotion) {
       return res.status(400).json({ error: "Emotion is required" });
     }
@@ -55,7 +55,11 @@ const recommendHandler = async (req, res) => {
       })
     );
 
-    res.status(200).json({ movies: results });
+    res.status(200).json({
+      mood: emotion, // Send back the determined mood
+      isHighIntensity: isHighIntensity, // Send the flag
+      movies: results,
+    });
   } catch (err) {
     console.error("Error in /recommend:", err);
     res.status(500).json({ error: "Something went wrong" });

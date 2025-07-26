@@ -1,12 +1,15 @@
 import { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import { motion, useMotionValue } from "framer-motion";
-import { 
-  FiSmile, FiFrown, FiZap, FiAlertTriangle, FiX, FiStar, FiMeh, FiCamera
-} from "react-icons/fi";
+import { FiSmile, FiFrown, FiZap, FiAlertTriangle, FiX, FiStar, FiMeh, FiCamera } from "react-icons/fi";
+import { toast } from 'sonner'; // 1. Import toast from sonner
 import "./Carousel.css";
 import MovieCard from "./MovieCard";
- const API_URL = process.env.NEXT_PUBLIC_API_URL;
-// Mood to Emotion map (used for backend compatibility)
+import MoodQuestionnaire from "./MoodQuestionnaire";
+import SupportModal from "./SupportModal";
+import LoadingSpinner from "./LoadingSpinner";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 const moodToEmotion = {
   joy: "joy",
   sadness: "sadness",
@@ -16,7 +19,6 @@ const moodToEmotion = {
   surprise: "surprise",
   anticipation: "anticipation",
 };
-
 
 const DEFAULT_ITEMS = [
   { title: "Mood Detection", description: "Detect your mood using your face or answer a questionnaire.", id: 0, icon: <FiCamera className="carousel-icon" />, mood: "detection" },
@@ -57,9 +59,21 @@ export default function Carousel({
   const [isResetting, setIsResetting] = useState(false);
   const containerRef = useRef(null);
   const [currentEmotion, setCurrentEmotion] = useState("");
+  const [showQuestionnaire, setShowQuestionnaire] = useState(false);
+  const [showSupportMessage, setShowSupportMessage] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const resultsRef = useRef(null);
 
   const handleMouseEnter = useCallback(() => setIsHovered(true), []);
   const handleMouseLeave = useCallback(() => setIsHovered(false), []);
+
+  useEffect(() => {
+    if (movies.length > 0 && resultsRef.current) {
+      setTimeout(() => {
+        resultsRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }, [movies]);
 
   useEffect(() => {
     if (pauseOnHover && containerRef.current) {
@@ -101,19 +115,11 @@ export default function Carousel({
     const offset = info.offset.x;
     const velocity = info.velocity.x;
     if (offset < -DRAG_BUFFER || velocity < -VELOCITY_THRESHOLD) {
-      if (loop && currentIndex === items.length - 1) {
-        setCurrentIndex(currentIndex + 1);
-      } else {
-        setCurrentIndex((prev) => Math.min(prev + 1, carouselItems.length - 1));
-      }
+      setCurrentIndex((prev) => Math.min(prev + 1, loop ? items.length : items.length - 1));
     } else if (offset > DRAG_BUFFER || velocity > VELOCITY_THRESHOLD) {
-      if (loop && currentIndex === 0) {
-        setCurrentIndex(items.length - 1);
-      } else {
-        setCurrentIndex((prev) => Math.max(prev - 1, 0));
-      }
+      setCurrentIndex((prev) => Math.max(prev - 1, 0));
     }
-  }, [loop, currentIndex, items.length, carouselItems.length]);
+  }, [loop, items.length]);
 
   const dragProps = useMemo(() => loop ? {} : {
     dragConstraints: {
@@ -123,44 +129,72 @@ export default function Carousel({
   }, [loop, trackItemOffset, carouselItems.length]);
 
   const handleCameraClick = useCallback(() => {
-    console.log("Camera button clicked");
     setShowDetector?.(true);
   }, [setShowDetector]);
 
- 
+  const handleQuestionnaireClick = useCallback(() => setShowQuestionnaire(true), []);
+  const handleCloseQuestionnaire = useCallback(() => setShowQuestionnaire(false), []);
+
+  const handleQuestionnaireSubmit = useCallback(async (answers) => {
+    setIsLoading(true);
+    setShowQuestionnaire(false);
+    try {
+      const response = await fetch(`${API_URL}/mood/analyze-quiz`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ answers }),
+      });
+      if (!response.ok) throw new Error(`Server error: ${response.status}`);
+      
+      const data = await response.json();
+      const detectedMood = data.mood.charAt(0).toUpperCase() + data.mood.slice(1);
+      
+      // 2. Use the toast function from sonner
+      toast.success(`Our analysis suggests you're feeling: ${detectedMood}`);
+      
+      setCurrentEmotion(data.mood || "results");
+      setMovies(data.movies || []);
+
+      if (data.isHighIntensity) {
+        setShowSupportMessage(true);
+      }
+    } catch (error) {
+      console.error("Fetch error from questionnaire:", error);
+      toast.error("Failed to get recommendations.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [API_URL]);
 
   const handleMoodSelect = useCallback(async (mood) => {
+    setIsLoading(true);
     const emotionLabel = moodToEmotion[mood] || mood;
     setCurrentEmotion(emotionLabel);
-    console.log("Mood selected:", emotionLabel);
     onMoodSelect?.(emotionLabel);
-
     try {
       const response = await fetch(`${API_URL}/mood/recommend`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ emotion: emotionLabel }),
       });
-
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`);
-      }
-
+      if (!response.ok) throw new Error(`Server error: ${response.status}`);
+      
       const data = await response.json();
-      console.log("Recommended Movies:", data.movies);
       setMovies(data.movies || []);
     } catch (error) {
       console.error("Fetch error:", error);
-      alert("Failed to fetch recommendations.");
+      toast.error("Failed to fetch recommendations.");
+    } finally {
+      setIsLoading(false);
     }
-  }, [onMoodSelect]);
+  }, [onMoodSelect, API_URL]);
 
   const renderItemContent = useCallback((item) => {
     if (item.mood === "detection") {
       return (
         <div className="mood-detection-buttons">
           <button onClick={handleCameraClick}>Detect via Camera</button>
-          
+          <button onClick={handleQuestionnaireClick}>Answer Questionnaire</button>
         </div>
       );
     } else {
@@ -173,87 +207,102 @@ export default function Carousel({
         </div>
       );
     }
-  }, [handleCameraClick, handleMoodSelect]);
+  }, [handleCameraClick, handleMoodSelect, handleQuestionnaireClick]);
 
   return (
-    <div
-      ref={containerRef}
-      className={`carousel-container ${round ? "round" : ""}`}
-      style={{
-        width: `${baseWidth}px`,
-        ...(round && { height: `${baseWidth}px`, borderRadius: "50%" }),
-      }}
-    >
-      <motion.div
-        className="carousel-track"
-        drag="x"
-        {...dragProps}
-        style={{ width: itemWidth, gap: `${GAP}px`, x }}
-        onDragEnd={handleDragEnd}
-        animate={{ x: -(currentIndex * trackItemOffset) }}
-        transition={effectiveTransition}
-        onAnimationComplete={handleAnimationComplete}
+    <>
+      {isLoading && <LoadingSpinner />}
+      
+      <div
+        ref={containerRef}
+        className={`carousel-container ${round ? "round" : ""}`}
+        style={{
+          width: `${baseWidth}px`,
+          ...(round && { height: `${baseWidth}px`, borderRadius: "50%" }),
+        }}
       >
-        {carouselItems.map((item, index) => (
-          <motion.div
-            key={`${item.id}-${index}`}
-            className={`carousel-item ${round ? "round" : ""}`}
-            style={{
-              width: itemWidth,
-              height: round ? itemWidth : "100%",
-              ...(round && { borderRadius: "50%" }),
-            }}
-            transition={effectiveTransition}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <div className={`carousel-item-header ${round ? "round" : ""}`}>
-              <span className="carousel-icon-container">{item.icon}</span>
-            </div>
-            <div className="carousel-item-content">
-              <div className="carousel-item-title">{item.title}</div>
-              {renderItemContent(item)}
-            </div>
-          </motion.div>
-        ))}
-      </motion.div>
-
-      <div className={`carousel-indicators-container ${round ? "round" : ""}`}>
-        <div className="carousel-indicators">
-          {items.map((_, index) => (
+        <motion.div
+          className="carousel-track"
+          drag="x"
+          {...dragProps}
+          style={{ width: itemWidth, gap: `${GAP}px`, x }}
+          onDragEnd={handleDragEnd}
+          animate={{ x: -(currentIndex * trackItemOffset) }}
+          transition={effectiveTransition}
+          onAnimationComplete={handleAnimationComplete}
+        >
+          {carouselItems.map((item, index) => (
             <motion.div
-              key={index}
-              className={`carousel-indicator ${currentIndex % items.length === index ? "active" : "inactive"}`}
-              animate={{ scale: currentIndex % items.length === index ? 1.2 : 1 }}
-              onClick={() => setCurrentIndex(index)}
-              transition={{ duration: 0.15 }}
-              whileHover={{ scale: 1.1 }}
-            />
-          ))}
-        </div>
-      </div>
-
-      {movies.length > 0 && (
-        <div className="mt-12 mb-12 px-4 w-full flex justify-center relative">
-          <div className="w-full max-w-5xl bg-zinc-900/80 rounded-2xl shadow-xl p-8 relative">
-            <button
-              className="absolute top-4 right-4 text-pink-200 hover:text-red-500 text-2xl z-10"
-              onClick={() => setMovies([])}
-              title="Close"
+              key={`${item.id}-${index}`}
+              className={`carousel-item ${round ? "round" : ""}`}
+              style={{
+                width: itemWidth,
+                height: round ? itemWidth : "100%",
+                ...(round && { borderRadius: "50%" }),
+              }}
+              transition={effectiveTransition}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
-              <FiX />
-            </button>
-            <h2 className="text-2xl font-bold text-pink-200 mb-6 text-center">
-              To watch when feeling {currentEmotion ? currentEmotion.charAt(0).toUpperCase() + currentEmotion.slice(1) : "this emotion"}
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8">
-              {movies.map((movie, index) => (
-                <MovieCard key={index} movie={movie} />
-              ))}
-            </div>
+              <div className={`carousel-item-header ${round ? "round" : ""}`}>
+                <span className="carousel-icon-container">{item.icon}</span>
+              </div>
+              <div className="carousel-item-content">
+                <div className="carousel-item-title">{item.title}</div>
+                {renderItemContent(item)}
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        <div className={`carousel-indicators-container ${round ? "round" : ""}`}>
+          <div className="carousel-indicators">
+            {items.map((_, index) => (
+              <motion.div
+                key={index}
+                className={`carousel-indicator ${currentIndex % items.length === index ? "active" : "inactive"}`}
+                animate={{ scale: currentIndex % items.length === index ? 1.2 : 1 }}
+                onClick={() => setCurrentIndex(index)}
+                transition={{ duration: 0.15 }}
+                whileHover={{ scale: 1.1 }}
+              />
+            ))}
           </div>
         </div>
+
+        {movies.length > 0 && (
+          <div ref={resultsRef} className="mt-12 mb-12 px-4 w-full flex justify-center relative">
+            <div className="w-full max-w-5xl bg-zinc-900/80 rounded-2xl shadow-xl p-8 relative">
+              <button
+                className="absolute top-4 right-4 text-pink-200 hover:text-red-500 text-2xl z-10"
+                onClick={() => setMovies([])}
+                title="Close"
+              >
+                <FiX />
+              </button>
+              <h2 className="text-2xl font-bold text-pink-200 mb-6 text-center">
+                To watch when feeling {currentEmotion ? currentEmotion.charAt(0).toUpperCase() + currentEmotion.slice(1) : "this emotion"}
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8">
+                {movies.map((movie, index) => (
+                  <MovieCard key={index} movie={movie} />
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+      
+      {showQuestionnaire && (
+        <MoodQuestionnaire
+          onSubmit={handleQuestionnaireSubmit}
+          onClose={handleCloseQuestionnaire}
+        />
       )}
-    </div>
+      
+      {showSupportMessage && (
+        <SupportModal onClose={() => setShowSupportMessage(false)} />
+      )}
+    </>
   );
 }

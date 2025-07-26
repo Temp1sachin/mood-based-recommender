@@ -1,0 +1,101 @@
+.support-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(26, 26, 46, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(8px);
+}
+
+.support-modal {
+  background-color: #1a1a2e;
+  color: #e0e0e0;
+  padding: 2rem 2.5rem;
+  border-radius: 1rem;
+  width: 90%;
+  max-width: 500px;
+  border: 1px solid #e0b0ff;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(224, 176, 255, 0.2);
+  position: relative;
+}
+
+.support-title {
+  font-size: 1.75rem;
+  font-weight: bold;
+  color: #e0b0ff;
+  margin-bottom: 1rem;
+}
+
+.support-message {
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  color: #c0c0e0;
+}
+
+.support-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  text-align: left;
+  margin-bottom: 2rem;
+}
+
+.support-action-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  background-color: #2a2a4e;
+  border-radius: 0.5rem;
+}
+
+.support-icon {
+  font-size: 1.5rem;
+  color: #e0b0ff;
+  margin-top: 0.25rem;
+  flex-shrink: 0;
+}
+
+.support-action-item strong {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.support-link {
+  color: #ff69b4;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.support-close-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: #e0b0ff;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.support-ok-button {
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  background-color: #e0b0ff;
+  color: #1a1a2e;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.support-ok-button:hover {
+  background-color: #ff69b4;
+}
