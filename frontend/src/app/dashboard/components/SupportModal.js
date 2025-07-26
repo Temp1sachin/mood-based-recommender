@@ -8,9 +8,9 @@ export default function SupportModal({ onClose }) {
         <button onClick={onClose} className="support-close-button">
           <FiX />
         </button>
-        <h2 className="support-title">It's Okay to Not Be Okay</h2>
+        <h2 className="support-title">{"It's Okay to Not Be Okay"}</h2>
         <p className="support-message">
-          Taking a moment for your mental well-being is a sign of strength. Please remember that you're not alone and help is available.
+          {"Taking a moment for your mental well-being is a sign of strength. Please remember that you're not alone and help is available."}
         </p>
         <div className="support-actions">
           <div className="support-action-item">
