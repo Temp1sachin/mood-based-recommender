@@ -347,16 +347,10 @@ router.get('/:roomId', async (req, res) => {
   }
 });
 
-// In routes/blend.js, inside the module.exports function
 
-// GET recommendations from participants' personal playlists
-// In routes/blend.js
-
-// This should ideally be initialized once in your main index.js and passed down
-// but for simplicity in this example, we'll initialize it here.
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const geminiModel = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+const geminiModel = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
 
 // ROUTE 1: Get recommendations from participants' personal playlists

@@ -12,7 +12,9 @@ const formatTime = (isoString) => {
   if (!isoString) return '';
   return new Date(isoString).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 };
- const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 const GeminiLoadingIndicator = () => (
   <motion.div
     className="flex items-center gap-3 p-2 ml-2"
@@ -33,7 +35,6 @@ const GeminiLoadingIndicator = () => (
   </motion.div>
 );
 
-
 const Chat = () => {
   const { user } = useContext(UserContext);
   const { roomId } = useParams();
@@ -46,9 +47,7 @@ const Chat = () => {
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
-    if (storedToken) {
-      setToken(storedToken);
-    }
+    if (storedToken) setToken(storedToken);
   }, []);
 
   useEffect(() => {
@@ -58,7 +57,7 @@ const Chat = () => {
         const res = await axios.get(`${API_URL}/blend/${roomId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-        if (res.data.room && res.data.room.chatHistory) {
+        if (res.data.room?.chatHistory) {
           setMessages(res.data.room.chatHistory);
         }
       } catch (err) {
@@ -74,24 +73,15 @@ const Chat = () => {
     if (!socket || !roomId || !user) return;
     socket.emit('join-blend-room', { roomId, user });
 
-    const handleReceiveMessage = (newMessage) => {
-      // DEBUG: Log every message received from the socket.
-      console.log("DEBUG: Received message from socket:", newMessage);
-
-      // ROBUST FIX: Check sender case-insensitively and stop the loader.
+    socket.on('receive-message', (newMessage) => {
       if (newMessage.sender?.toLowerCase() === 'gemini') {
-        console.log("DEBUG: Gemini response detected. Hiding loader.");
         setIsGeminiLoading(false);
       }
-      
-      if (newMessage.sender !== user.email) {
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
-      }
-    };
+      setMessages((prev) => [...prev, newMessage]);
+    });
 
-    socket.on('receive-message', handleReceiveMessage);
     return () => {
-      socket.off('receive-message', handleReceiveMessage);
+      socket.off('receive-message');
     };
   }, [roomId, user]);
 
@@ -103,30 +93,13 @@ const Chat = () => {
     if (!message.trim() || !user || !token) return;
 
     if (message.toLowerCase().includes('@gemini')) {
-      // DEBUG: Confirm the loader is being triggered.
-      console.log("DEBUG: Gemini trigger detected. Showing loader.");
       setIsGeminiLoading(true);
     }
-    
-    const optimisticMessage = {
-      _id: `temp_${Date.now()}`,
-      message,
-      sender: user.email,
-      timestamp: new Date().toISOString(),
-    };
-    setMessages((prevMessages) => [...prevMessages, optimisticMessage]);
+
     setMessage('');
+    socket.emit('chat-message', { roomId, message, sender: user.email });
 
-    const chatData = { roomId, message, sender: user.email };
-    socket.emit('chat-message', chatData);
-
-    try {
-      await axios.post(`${API_URL}/blend/chat/message`, { roomId, message }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-    } catch (err) {
-      console.error("Failed to save message:", err);
-    }
+    
   };
 
   return (
@@ -134,7 +107,7 @@ const Chat = () => {
       <div className="flex-1 overflow-y-auto pr-4 space-y-4">
         {messages.map((msg, idx) => {
           const isSender = msg.sender === user?.email;
-          const isGemini = msg.sender?.toLowerCase() === 'gemini'; // Robust check
+          const isGemini = msg.sender?.toLowerCase() === 'gemini';
 
           return (
             <motion.div
@@ -158,17 +131,15 @@ const Chat = () => {
                     Gemini
                   </span>
                 )}
-                
                 <div className={`px-4 py-2.5 rounded-2xl w-auto ${
-                  isSender 
-                    ? 'bg-gradient-to-br from-pink-600 to-pink-500 text-white rounded-br-none' 
+                  isSender
+                    ? 'bg-gradient-to-br from-pink-600 to-pink-500 text-white rounded-br-none'
                     : isGemini
                       ? 'bg-gradient-to-br from-purple-900 to-indigo-900 text-gray-200 text-center border border-purple-700/50'
                       : 'bg-gray-800 text-gray-300 rounded-bl-none'
                 }`}>
                   <p className="whitespace-pre-wrap break-words">{msg.message}</p>
                 </div>
-                
                 <span className="text-xs text-gray-500 mt-1 px-1">
                   {formatTime(msg.timestamp)}
                 </span>
@@ -180,11 +151,11 @@ const Chat = () => {
         <AnimatePresence>
           {isGeminiLoading && <GeminiLoadingIndicator />}
         </AnimatePresence>
-        
+
         <div ref={messagesEndRef} />
       </div>
 
-      <motion.div 
+      <motion.div
         className="mt-4 flex gap-3"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}

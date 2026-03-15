@@ -16,7 +16,7 @@ const app = express();
 const server = http.createServer(app); // ⬅️ use HTTP server for Socket.io
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const geminiModel = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+const geminiModel = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
 const io = new Server(server, {
   cors: {
@@ -132,8 +132,7 @@ socket.on('chat-message', async ({ roomId, message, sender }) => {
     room.chatHistory.push({ sender, message });
     await room.save();
 
-    // Broadcast the user's message to everyone else in the room
-    socket.to(roomId).emit('receive-message', { message, sender });
+    io.to(roomId).emit('receive-message', { message, sender });
 
     // --- 2. Check if the Message is a Prompt for Gemini ---
     if (message.includes('@')) {
